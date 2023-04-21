@@ -1,0 +1,11 @@
+# RUN
+```
+source ./environ.sh
+docker-compose up --build web
+or
+```
+docker-compose build --no-cache
+docker-compose up
+# TEST
+docker-compose exec web pytest
+```
