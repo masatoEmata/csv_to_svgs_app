@@ -1,11 +1,19 @@
 # RUN
-```
+```bash
 source ./environ.sh
 docker-compose up --build web
-or
 ```
+or
+```bash
 docker-compose build --no-cache
 docker-compose up
 # TEST
+```bash
 docker-compose exec web pytest
+```
+# DEBUG
+```bash
+gcloud compute ssh ${CONTAINER_NAME} --zone ${ZONE}
+docker ps
+docker logs [docker psで確認したコンテナID]
 ```

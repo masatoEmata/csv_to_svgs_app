@@ -12,6 +12,8 @@ black = "*"
 chardet = "*"
 jinja2 = "*"
 httpx = "*"
+beautifulsoup4 = "*"
+lxml = "*"
 
 [dev-packages]
 pytest = "*"
