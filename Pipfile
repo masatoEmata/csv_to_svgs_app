@@ -14,9 +14,23 @@ jinja2 = "*"
 httpx = "*"
 beautifulsoup4 = "*"
 lxml = "*"
+gunicorn = "*"
 
 [dev-packages]
 pytest = "*"
 
 [requires]
 python_version = "3.10"
+
+[scripts]
+auth = "bash -c 'gcloud auth login && source ./environ.sh && gcloud config set project ${GCP_PJ_ID}'"
+clear = "bash -c 'docker rm $(docker ps -aqf \"status=exited\") && docker image prune -a'"
+build = "bash -c 'source ./environ.sh && echo ${LOCAL_IMAGE} && docker build -t ${LOCAL_IMAGE} .'"
+build-nocache = "bash -c 'source ./environ.sh && docker build --no-cache -t ${LOCAL_IMAGE} .'"
+up = "bash -c 'source ./environ.sh && echo ${LOCAL_IMAGE} && docker run -p 8000:8000 -e MODE=dev --rm --name ${LOCAL_CONTAINER} -v .:/app -it ${LOCAL_IMAGE}'"
+down = "bash -c 'source ./environ.sh && docker rm -f ${LOCAL_CONTAINER}'"
+testall = "bash -c 'source ./environ.sh && docker exec -it ${LOCAL_CONTAINER} pytest'"
+repository = "bash -c 'source ./environ.sh && gcloud auth configure-docker ${DEPLOY_DMAIN} && gcloud artifacts repositories create ${DEPLOY_REPO} --repository-format=docker --location=${REGION}'"
+push = "bash -c 'echo Prerequest: pipenv run auth and you have uploadArtifacts role && source ./environ.sh && docker build --platform=linux/amd64 -t ${SERVICE}-amd64 . && docker tag ${SERVICE}-amd64 ${IMAGE}:latest && docker push ${IMAGE} --all-tags'"
+push-nocache = "bash -c 'echo Prerequest: pipenv run auth and you have uploadArtifacts role && source ./environ.sh && docker build --no-cache --platform=linux/amd64 -t ${SERVICE}-amd64 . && docker tag ${SERVICE}-amd64 ${IMAGE}:latest && docker push ${IMAGE} --all-tags'"
+deploy = "bash -c 'source ./environ.sh && gcloud run deploy ${SERVICE}-run --image ${IMAGE}:latest --allow-unauthenticated --region=${REGION} --project=${GCP_PJ_ID}'"

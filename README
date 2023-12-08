@@ -1,19 +1,57 @@
-# RUN
+# Setup vscode
+add below in settings.json
+```json
+    "python.pipenvPath": "${workspaceFolder}/.venv/bin/python",
+```
+add below in ~/.bashrc
 ```bash
+export PIPENV_VENV_IN_PROJECT=1
+```
+
+# Install
+- Install pipenv  
+https://qiita.com/kapibara-3/items/c4acf09c8b61e43699ab
+```bash
+pip install pipenv
+pipenv install
+pipenv shell
+```
+- Install gcloud cli  
+https://cloud.google.com/sdk/docs/install-sdk
+
+- Install docker  
+https://matsuand.github.io/docs.docker.jp.onthefly/desktop/mac/install/  
+## info
+- https://qiita.com/townsoft/items/77e3c295f44de991abf6  
+- https://sparkbyexamples.com/docker/docker-error-storing-credentials-err-exec-docker-credential-desktop-executable-file-not-found-in-path-out/  
+
+# Executing Commands
+## 0. Set local variable
 source ./environ.sh
-docker-compose up --build web
-```
-or
+
+## 1. First Google Auth
 ```bash
-docker-compose build --no-cache
-docker-compose up
-# TEST
-```bash
-docker-compose exec web pytest
+pipenv run auth
 ```
-# DEBUG
+## 2. Build
 ```bash
-gcloud compute ssh ${CONTAINER_NAME} --zone ${ZONE}
-docker ps
-docker logs [docker psで確認したコンテナID]
+pipenv run buildup  # or: pipenv run build-nocache
 ```
+## 3. Up and Down
+```bash
+pipenv run up
+pipenv run down
+```
+## 4. Test
+```bash
+pipenv run testall  # for whole test
+source ./environ.sh && docker-compose run --rm test {{TEST_FILE_PATH}}  # for partial test
+```
+## 5. Deploy
+```bash
+pipenv run repository  # if you have not created the container repository for this project.
+
+pipenv run push  # or: pipenv run push-nocache
+pipenv run deploy
+```
+or.. If 'main' branch was updated by beeing merged or pushed, deploy job of github actions will automatically start.

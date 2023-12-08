@@ -1,13 +1,30 @@
+# python version
 FROM python:3.10-slim
 
-WORKDIR /app
+#  copy code, pipfile
+WORKDIR /app/
+COPY . /app/
 
-COPY Pipfile Pipfile.lock ./
-# httpxのインストール先をsys.pathに追加
-ENV PYTHONPATH="${PYTHONPATH}:/usr/local/lib/python3.10/site-packages/"
+# init apt-get and default installs
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    python3-dev \
+    gcc
 
-RUN pip install pipenv && pipenv install --system --deploy --ignore-pipfile --dev
+#  create pipenv environment
+RUN pip install pipenv
+# RUN python3 -m venv /opt/venv \
+#     && /opt/venv/bin/python -m pip install pip --upgrade \
+#     && /opt/venv/bin/python -m pip install -r requirements.txt
 
-COPY ./app ./app
+# Install dependencies in pipenv
+RUN pipenv install --system --ignore-pipfile
 
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--log-level", "debug"]
+# Cleanup
+RUN apt-get remove -y --purge build-essential python3-dev gcc \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/*
+
+# entrypoint
+RUN chmod +x ./entrypoint.sh
+ENTRYPOINT ["bash", "entrypoint.sh"]
